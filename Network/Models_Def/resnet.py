@@ -9,6 +9,17 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+# --- ADDED FOR APPLE SILICON SUPPORT ---
+# Define the device dynamically
+if torch.backends.mps.is_available():
+    device = torch.device("mps")
+elif torch.cuda.is_available():
+    device = torch.device("cuda")
+else:
+    device = torch.device("cpu")
+
+print(f"Using device: {device}")
+# ---------------------------------------
 
 class BasicBlock(nn.Module):
     expansion = 1
@@ -149,7 +160,7 @@ def test():
     print(y.size())
 
 #from torchsummary import summary
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+# device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 if __name__ =='__main__':
     net = ResNet10()
     print(net.parameters('linear'))

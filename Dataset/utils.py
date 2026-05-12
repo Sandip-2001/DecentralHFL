@@ -23,9 +23,11 @@ seed = Seed
 random.seed(seed)
 np.random.seed(seed)
 torch.manual_seed(seed)
-if torch.cuda.is_available():
+if torch.backends.mps.is_available():
+    torch.mps.manual_seed(seed)
+elif torch.cuda.is_available():
     torch.cuda.manual_seed_all(seed)
-Project_Path = r'/home/fangxiuwen/'
+Project_Path = './'
 
 def init_logs(log_level=logging.INFO,log_path = Project_Path+'Logs/',sub_name=None):
     # logging：https://www.cnblogs.com/CJOKER/p/8295272.html
@@ -131,7 +133,7 @@ def get_dataloader(dataset, datadir, train_bs, test_bs, dataidxs=None, noise_lev
             transforms.ToTensor(),
             normalize_train
         ])
-        train_ds = dl_obj(datadir, dataidxs=dataidxs, c_type=corrupt_type, transform=transform_train, corrupt_rate=corrupt_rate)
+        train_ds = dl_obj(datadir, dataidxs=dataidxs, transform=transform_train, corrupt_rate=corrupt_rate)
 
     # For the test dataset:
     if test_dataset == 'clean':
@@ -220,7 +222,7 @@ def get_augmix_private_dataloader(dataset, datadir, train_bs, test_bs, dataidxs=
         preprocess = transforms.Compose(
             [transforms.ToTensor(),
              transforms.Normalize([0.5] * 3, [0.5] * 3)])
-        train_ds = dl_obj(datadir, dataidxs=dataidxs, c_type=corrupt_type, transform=transform_train, corrupt_rate=corrupt_rate)
+        train_ds = dl_obj(datadir, dataidxs=dataidxs, transform=transform_train, corrupt_rate=corrupt_rate)
         train_ds = AugMixDataset(train_ds, preprocess, no_jsd=False)
 
     # For the test dataset:
@@ -243,7 +245,7 @@ def get_augmix_private_dataloader(dataset, datadir, train_bs, test_bs, dataidxs=
         ])
         test_ds = CIFAR_C(test_datadir, transform=transform_test, corrupt_rate=test_corrupt_rate)
 
-    train_dl = data.DataLoader(dataset=train_ds, batch_size=train_bs, drop_last=True, shuffle=True, num_workers=8)
+    train_dl = data.DataLoader(dataset=train_ds, batch_size=train_bs, drop_last=True, shuffle=True)
     test_dl = data.DataLoader(dataset=test_ds, batch_size=test_bs, drop_last=True, shuffle=False)
 
     return train_dl, test_dl, train_ds, test_ds

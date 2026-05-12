@@ -1,0 +1,26 @@
+{
+  "canisters": {
+    "fl_server_backend": {
+      "main": "src/fl_server_backend/main.mo",
+      "type": "motoko"
+    },
+    "fl_server_frontend": {
+      "dependencies": [
+        "fl_server_backend"
+      ],
+      "source": [
+        "src/fl_server_frontend/dist"
+      ],
+      "type": "assets",
+      "workspace": "fl_server_frontend"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}

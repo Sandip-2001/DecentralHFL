@@ -1,7 +1,7 @@
 import os
 
-os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = "4,5,6,7"
+# os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+# os.environ["CUDA_VISIBLE_DEVICES"] = "4,5,6,7"
 import sys
 sys.path.append("..")
 from Dataset.utils import init_logs, get_dataloader, init_nets, mkdirs
@@ -17,6 +17,18 @@ import random
 import torch
 import torch.backends.cudnn
 import os
+
+# --- ADDED FOR APPLE SILICON SUPPORT ---
+# Define the device dynamically
+if torch.backends.mps.is_available():
+    device = torch.device("mps")
+elif torch.cuda.is_available():
+    device = torch.device("cuda")
+else:
+    device = torch.device("cpu")
+
+print(f"Using device: {device}")
+# ---------------------------------------
 
 '''
 Global Parameters
@@ -110,12 +122,16 @@ if __name__ =='__main__':
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
-    if torch.cuda.is_available():
+    # if torch.cuda.is_available():
+    #     torch.cuda.manual_seed_all(seed)
+    if torch.backends.mps.is_available():
+        torch.mps.manual_seed(seed)
+    elif torch.cuda.is_available():
         torch.cuda.manual_seed_all(seed)
     # os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
     # os.environ["CUDA_VISIBLE_DEVICES"] = "0,1"
     device_ids = [0,1,2,3]
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     torch.backends.cudnn.benchmark = False
     torch.backends.cudnn.deterministic = True
 

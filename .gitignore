@@ -1,2 +1,24 @@
 /.idea/
 .DS_Store
+# Python & macOS
+__pycache__/
+*.pyc
+.DS_Store
+aughfl_env/
+
+# PyTorch & Machine Learning Models
+Network/Model_Storage/
+test/Model_Storage/
+*.ckpt
+*.pth
+*.npy
+Logs/
+*.log
+
+# Datasets (Do not upload 60,000 images!)
+Dataset/cifar_10/
+Dataset/cifar_100/
+
+# Internet Computer / DFX
+fl_server/.dfx/
+fl_server/.env

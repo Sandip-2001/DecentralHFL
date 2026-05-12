@@ -71,7 +71,7 @@ def plasma_fractal(mapsize=32, wibbledecay=3):
     'mapsize' must be a power of two.
     """
     assert (mapsize & (mapsize - 1) == 0)
-    maparray = np.empty((mapsize, mapsize), dtype=np.float_)
+    maparray = np.empty((mapsize, mapsize), dtype=np.float64)
     maparray[0, 0] = 0
     stepsize = mapsize
     wibble = 100
@@ -162,7 +162,7 @@ def speckle_noise(x, severity=1):
 def gaussian_blur(x, severity=1):
     c = [.4, .6, 0.7, .8, 1][severity - 1]
 
-    x = gaussian(np.array(x) / 255., sigma=c, multichannel=True)
+    x = gaussian(np.array(x) / 255., sigma=c, channel_axis=-1)
     return np.clip(x, 0, 1) * 255
 
 
@@ -170,7 +170,7 @@ def glass_blur(x, severity=1):
     # sigma, max_delta, iterations
     c = [(0.05,1,1), (0.25,1,1), (0.4,1,1), (0.25,1,2), (0.4,1,2)][severity - 1]
 
-    x = np.uint8(gaussian(np.array(x) / 255., sigma=c[0], multichannel=True) * 255)
+    x = np.uint8(gaussian(np.array(x) / 255., sigma=c[0], channel_axis=-1) * 255)
 
     # locally shuffle pixels
     for i in range(c[2]):
@@ -181,7 +181,7 @@ def glass_blur(x, severity=1):
                 # swap
                 x[h, w], x[h_prime, w_prime] = x[h_prime, w_prime], x[h, w]
 
-    return np.clip(gaussian(x / 255., sigma=c[0], multichannel=True), 0, 1) * 255
+    return np.clip(gaussian(x / 255., sigma=c[0], channel_axis=-1), 0, 1) * 255
 
 
 def defocus_blur(x, severity=1):
@@ -458,7 +458,7 @@ Train CIFAR10 dataset corruption
 """
 mkdirs('../Dataset/cifar_10/CIFAR-10-C_train')
 print('Using CIFAR-10 data')
-train_data = dset.CIFAR10('../Dataset/cifar_10', train=True)
+train_data = dset.CIFAR10('../Dataset/cifar_10', train=True, download=True)
 convert_img = trn.Compose([trn.ToTensor(), trn.ToPILImage()])
 
 corruption_rate_list = [0, 0.5, 1]
@@ -473,7 +473,7 @@ for corruption_rate in corruption_rate_list:
     cifar_c, labels = [], []
 
     for index, (img, label) in enumerate(zip(train_data.data, train_data.targets)):
-        method_name = random.sample(d.keys(), 1)[0]
+        method_name = random.sample(list(d.keys()), 1)[0]
 
         # for severity in range(1,6):
         severity = np.random.randint(1, 5)
@@ -494,7 +494,7 @@ Test dataset corruption
 """
 mkdirs('../Dataset/cifar_10/CIFAR-10-C_test')
 print('Using CIFAR-10 test data')
-train_data = dset.CIFAR10('../Dataset/cifar_10', train=False)
+train_data = dset.CIFAR10('../Dataset/cifar_10', train=False, download=True)
 convert_img = trn.Compose([trn.ToTensor(), trn.ToPILImage()])
 
 corruption_rate_list = [0, 1]
@@ -509,7 +509,7 @@ for corruption_rate in corruption_rate_list:
     cifar_c, labels = [], []
 
     for index, (img, label) in enumerate(zip(train_data.data, train_data.targets)):
-        method_name = random.sample(d.keys(), 1)[0]
+        method_name = random.sample(list(d.keys()), 1)[0]
 
         # for severity in range(1,6):
         severity = np.random.randint(1, 5)
@@ -527,7 +527,7 @@ for corruption_rate in corruption_rate_list:
 Train CIFAR100 dataset corruption
 """
 print('Using CIFAR-100 data')
-train_data = dset.CIFAR100('../Dataset/cifar_100', train=True)
+train_data = dset.CIFAR100('../Dataset/cifar_100', train=True, download=True)
 convert_img = trn.Compose([trn.ToTensor(), trn.ToPILImage()])
 
 # for method_name in d.keys():
@@ -535,7 +535,7 @@ print('Creating images for the corruption.')
 cifar_c, labels = [], []
 
 for img, label in zip(train_data.data, train_data.targets):
-    method_name = random.sample(d.keys(), 1)[0]
+    method_name = random.sample(list(d.keys()), 1)[0]
 
     # for severity in range(1,6):
     severity = np.random.randint(1, 5)
